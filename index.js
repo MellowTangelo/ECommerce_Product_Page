@@ -6,15 +6,37 @@ const slideInMenu = document.querySelector(".menu-items");
 const hamburgerMenuButton = document.querySelector(".menu-button");
 const closeButton = document.querySelector(".menu-item-button");
 
-hamburgerMenuButton.addEventListener("click", toggleSlideInMenu);
-closeButton.addEventListener("click", toggleSlideInMenu);
+hamburgerMenuButton.addEventListener("click", showSlideInMenu);
+closeButton.addEventListener("click", hideSlideInMenu);
 
-function toggleSlideInMenu()
+function showSlideInMenu()
+{
+    coveringPanel.classList.toggle('shadow');
+    coveringPanel.classList.toggle('move');
+    slideInMenu.classList.toggle('show');
+
+}
+
+function hideSlideInMenu()
 {
     coveringPanel.classList.toggle('shadow');
     slideInMenu.classList.toggle('show');
+
+    setTimeout(() => {coveringPanel.classList.toggle('move');}, 500);
 }
 
+window.addEventListener("resize", defaultMenuSettings)
+
+function defaultMenuSettings()
+{
+    let windowSize = window.innerWidth;
+
+    if (windowSize > 720){
+        coveringPanel.classList.remove('shadow');
+        coveringPanel.classList.remove('move');
+        slideInMenu.classList.remove('show');
+    }
+}
 // Image display - mobile
 
 const previousButton = document.querySelector(".button-previous");
@@ -92,26 +114,65 @@ function showImg(index) {
 const itemsInCart = document.querySelector(".items-in-cart");
 const itemsSelected = document.querySelector(".number-of-items");
 
+const totalAmount = document.querySelector(".total-amount");
+const totalPrice = document.querySelector(".total-price");
+const deleteButton = document.querySelector(".delete-button");
+
 const minusButton = document.querySelector(".minus-button");
 const plusButton = document.querySelector(".plus-button");
 const addToCartButton = document.querySelector(".cart-button");
 
+let current = parseInt(itemsInCart.textContent, 10);
+const emptyCartInfo = document.querySelector(".empty-cart-info");
+const cartInfo = document.querySelector(".cart-info");
+const checkoutButton = document.querySelector(".checkout-button");
+
+if(current == 0) {
+    emptyCartInfo.style.display = "block";
+    cartInfo.style.display = "none";
+    checkoutButton.style.display = "none";
+}
+else {
+    emptyCartInfo.style.display = "none";
+    cartInfo.style.display = "flex";
+    checkoutButton.style.display = "flex";
+}
+
 minusButton.addEventListener("click", decrementValue);
 plusButton.addEventListener("click", incrementValue);
 addToCartButton.addEventListener("click", updateCart);
+deleteButton.addEventListener("click", removeSingleItem)
 
 function updateCart() {
     let current = parseInt(itemsInCart.textContent, 10);
     let value = parseInt(itemsSelected.textContent, 10);
     current += value;
     itemsInCart.textContent = current;
+    totalAmount.textContent = current;
+    let price = parseInt(totalAmount.textContent, 10) * 125
+    totalPrice.textContent = '$' + price.toFixed(2);
     
     if (current == 0) {
         itemsInCart.style.visibility = 'hidden';
+        emptyCartInfo.style.display = "block";
+        cartInfo.style.display = "none";
+        checkoutButton.style.display = "none";
     }
     else {
         itemsInCart.style.visibility = 'visible';
         itemsSelected.textContent = 0;
+        emptyCartInfo.style.display = "none";
+        cartInfo.style.display = "flex";
+        checkoutButton.style.display = "flex";
+    }
+}
+
+function removeSingleItem() {
+    let value = parseInt(itemsInCart.textContent, 10);
+    if(value != 0) {
+        value--;
+        itemsInCart.textContent = value;
+        updateCart();
     }
 }
 
@@ -130,4 +191,22 @@ function incrementValue() {
     value = isNaN(value) ? 0 : value;
     value++;
     itemsSelected.textContent = value;
+}
+
+// Cart content
+
+const cartContentButton = document.querySelector(".nav-cart-button");
+const cartContent = document.querySelector(".cart-content-container");
+
+cartContentButton.addEventListener("click", toggleCartContent);
+
+function toggleCartContent() {
+    if(cartContent.classList.contains('show')) {
+        cartContent.classList.toggle('show');
+        setTimeout(() => {cartContent.classList.toggle('appear');}, 500);
+    }
+    else {
+        cartContent.classList.toggle('appear');
+        setTimeout(() => {cartContent.classList.toggle('show');}, 0);
+    }
 }
